@@ -1,3 +1,4 @@
-FROM docker:latest
+FROM rockylinux:8
 
-RUN apk add nodejs
+RUN dnf install -y docker
+RUN dnf module install -y nodejs:18
