@@ -1,0 +1,35 @@
+name: Build docker image
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    if: "!github.event.release.prerelease"
+    runs-on: ubuntu-latest
+    steps:
+      - name: login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          username: svenlie
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - uses: actions/checkout@v3
+      - name: Build docker image
+        run: docker build . --file ./Dockerfile --tag svenlie/docker:${GITHUB_REF##*/} --tag svenlie/docker:latest
+      - name: Push docker images
+        run: docker push svenlie/docker --all-tags
+  build-dev:
+    if: "github.event.release.prerelease"
+    runs-on: ubuntu-latest
+    steps:
+      - name: login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          username: svenlie
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - uses: actions/checkout@v3
+      - name: Build the docker image
+        run: docker build . --file ./Dockerfile --tag svenlie/docker:${GITHUB_REF##*/} --tag svenlie/docker:latest-dev
+      - name: Push docker images
+        run: docker push svenlie/docker --all-tags
